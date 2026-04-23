@@ -723,7 +723,7 @@
 <!-- ══ FOTOS ══ -->
 <div class="fotos-sec reveal" id="fotos">
   <div style="max-width:900px;margin:0 auto;text-align:center">
-    <span class="section-label">Um resumo da</span>
+    <span class="section-label">Nossa história</span>
     <h2 class="section-title">Nossa <em>história</em> até aqui</h2>
     <div class="sec-orn" style="justify-content:center">
       <span class="sec-orn-line"></span><span class="sec-orn-dot"></span><span class="sec-orn-line"></span>
@@ -923,7 +923,8 @@
     <button class="qr-close" onclick="fecharQR()">✕</button>
     <p class="qr-title" id="qr-nome">Presente</p>
     <p class="qr-subtitle">Escaneie o QR code abaixo para fazer o PIX<br>ou copie a chave:</p>
-    <img class="qr-img" id="qr-img" src="" alt="QR Code PIX">
+    <img class="qr-img" id="qr-img" src="" alt="QR Code PIX" style="display:none">
+    <canvas id="qr-canvas" style="width:200px;height:200px;border:1px solid var(--cream-mid);padding:8px;display:block;margin:0 auto 1.2rem;box-sizing:content-box"></canvas>
     <p class="qr-valor" id="qr-valor">R$ 0,00</p>
     <p class="qr-chave">Chave PIX: <strong>(85) 9 8177-7415</strong> · Bradesco<br>José Gomes dos Santos Filho</p>
     <button class="copy-btn" onclick="copyPix()" style="width:100%;margin-top:.5rem">Copiar chave PIX</button>
@@ -971,6 +972,11 @@
   <div class="footer-love">Feito com amor ♡</div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+// shim: qrcodejs usa QRCode() mas precisamos de QRCode.toCanvas — usamos qrcode npm via CDN
+</script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
 // ══════════════════════════════════════════════
 // LISTA DE CONVIDADOS — adicione nomes aqui!
@@ -1092,22 +1098,73 @@ function changeQty(btn, delta) {
   card.querySelector('.cota-total').innerHTML = `Total: <strong>R$ ${total}</strong>`;
 }
 
+// ══ Gerador de payload PIX ══
+function crc16(str) {
+  let crc = 0xFFFF;
+  for (let i = 0; i < str.length; i++) {
+    crc ^= str.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) {
+      crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+    }
+  }
+  return ((crc & 0xFFFF).toString(16).toUpperCase()).padStart(4,'0');
+}
+
+function tlv(id, value) {
+  const len = String(value.length).padStart(2,'0');
+  return `${id}${len}${value}`;
+}
+
+function gerarPixPayload(chave, valor, nome, cidade) {
+  const merchantName = nome.substring(0,25).toUpperCase();
+  const merchantCity = cidade.substring(0,15).toUpperCase();
+  const valorStr = parseFloat(valor).toFixed(2);
+
+  const gui = tlv('00','BR.GOV.BCB.PIX');
+  const pixKey = tlv('01', chave);
+  const merchantAccountInfo = tlv('26', gui + pixKey);
+
+  let payload =
+    tlv('00','01') +
+    merchantAccountInfo +
+    tlv('52','0000') +
+    tlv('53','986') +
+    tlv('54', valorStr) +
+    tlv('58','BR') +
+    tlv('59', merchantName) +
+    tlv('60', merchantCity) +
+    tlv('62', tlv('05','***'));
+
+  payload += tlv('63','0000');
+  const crc = crc16(payload);
+  return payload.slice(0,-4) + tlv('63', crc);
+}
+
 function presentear(btn) {
   const card = btn.closest('.cota-card');
-  const nome = card.dataset.nome;
+  const nomePresente = card.dataset.nome;
   const valorCota = parseInt(card.dataset.valor);
   const qty = parseInt(card.querySelector('.cota-qty-num').textContent);
   const total = valorCota * qty;
   const totalReais = (total / 100).toFixed(2);
   const totalFmt = totalReais.replace('.',',');
 
-  document.getElementById('qr-nome').textContent = nome;
+  document.getElementById('qr-nome').textContent = nomePresente;
   document.getElementById('qr-valor').textContent = `R$ ${totalFmt}`;
 
-  // Gera QR code via API gratuita do goqr.me
-  const pixKey = '85981777415';
-  const qrData = encodeURIComponent(`PIX:${pixKey} VALOR:${totalReais}`);
-  document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${qrData}`;
+  // Gera payload PIX real
+  const payload = gerarPixPayload(
+    '85981777415',
+    totalReais,
+    'DIMAS FILHO',
+    'FORTALEZA'
+  );
+
+  // Renderiza QR code no canvas
+  const canvas = document.getElementById('qr-canvas');
+  QRCode.toCanvas(canvas, payload, { width: 200, margin: 1, color: { dark:'#1f2d5a', light:'#fdfcfa' } }, err => {
+    if(err) console.error(err);
+  });
 
   document.getElementById('qr-modal').classList.add('open');
 }
