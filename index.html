@@ -723,7 +723,7 @@
 <!-- ══ FOTOS ══ -->
 <div class="fotos-sec reveal" id="fotos">
   <div style="max-width:900px;margin:0 auto;text-align:center">
-    <span class="section-label">Nossa história</span>
+    <span class="section-label">Um resumo da nossa</span>
     <h2 class="section-title">Nossa <em>história</em> até aqui</h2>
     <div class="sec-orn" style="justify-content:center">
       <span class="sec-orn-line"></span><span class="sec-orn-dot"></span><span class="sec-orn-line"></span>
@@ -922,12 +922,10 @@
   <div class="qr-box">
     <button class="qr-close" onclick="fecharQR()">✕</button>
     <p class="qr-title" id="qr-nome">Presente</p>
-    <p class="qr-subtitle">Escaneie o QR code abaixo para fazer o PIX<br>ou copie a chave:</p>
-    <img class="qr-img" id="qr-img" src="" alt="QR Code PIX" style="display:none">
-    <canvas id="qr-canvas" style="width:200px;height:200px;border:1px solid var(--cream-mid);padding:8px;display:block;margin:0 auto 1.2rem;box-sizing:content-box"></canvas>
+    <p class="qr-subtitle">Copie o código abaixo e cole no seu banco<br>na opção <strong>PIX copia e cola</strong>:</p>
     <p class="qr-valor" id="qr-valor">R$ 0,00</p>
     <p class="qr-chave">Chave PIX: <strong>(85) 9 8177-7415</strong> · Bradesco<br>José Gomes dos Santos Filho</p>
-    <button class="copy-btn" onclick="copyPix()" style="width:100%;margin-top:.5rem">Copiar chave PIX</button>
+    <button class="copy-btn" id="btn-copy-payload" onclick="copyPayload()" style="width:100%;margin-top:.5rem;background:var(--navy);color:white;border-color:var(--navy)">Copiar código PIX completo</button>
   </div>
 </div>
 
@@ -972,114 +970,8 @@
   <div class="footer-love">Feito com amor ♡</div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
-// ══════════════════════════════════════════════
-// LISTA DE CONVIDADOS — adicione nomes aqui!
-// ══════════════════════════════════════════════
-const CONVIDADOS = [
-  "Ana Beatriz",
-  "Dimas",
-  // adicione mais nomes abaixo, um por linha:
-  // "Nome Sobrenome",
-];
-// ══════════════════════════════════════════════
 
-// ══ SUPABASE CONFIG ══
-const SUPABASE_URL = 'https://hsrulejhcnjzephaexcs.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzcnVsZWpoY25qemVwaGFleGNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTI0NzUsImV4cCI6MjA5MjUyODQ3NX0.xqV4-QQXYgnx14fpt6LSdZbwTaR_EfEnoi0HtrRfcUI';
-
-async function salvarConfirmacao(nome, confirmado, mensagem) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/confirmacoe`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify({
-      nome,
-      'confirmação': confirmado,
-      mensagem,
-      created_at: new Date().toISOString()
-    })
-  });
-  return res.ok;
-}
-
-function updateCountdown(){
-  const diff=new Date('2026-09-27T15:00:00')-new Date();
-  if(diff<=0){['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id=>document.getElementById(id).textContent='0');return;}
-  document.getElementById('cd-days').textContent =String(Math.floor(diff/86400000)).padStart(2,'0');
-  document.getElementById('cd-hours').textContent=String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
-  document.getElementById('cd-mins').textContent =String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
-  document.getElementById('cd-secs').textContent =String(Math.floor((diff%60000)/1000)).padStart(2,'0');
-}
-updateCountdown(); setInterval(updateCountdown,1000);
-
-// Guest search
-let selectedGuest = null;
-
-function searchGuest(){
-  const q = document.getElementById('rsvp-search').value.trim().toLowerCase();
-  const box = document.getElementById('guest-results');
-  selectedGuest = null;
-  document.getElementById('rsvp-nome-selected').value = '';
-
-  if(q.length < 2){ box.style.display='none'; box.innerHTML=''; return; }
-
-  const matches = CONVIDADOS.filter(n => n.toLowerCase().includes(q));
-  box.style.display = 'block';
-
-  if(matches.length === 0){
-    box.innerHTML = '<div class="guest-not-found">Nome não encontrado na lista. Verifique com os noivos.</div>';
-    return;
-  }
-
-  box.innerHTML = matches.map(n =>
-    `<div class="guest-item" onclick="selectGuest('${n.replace(/'/g,"\\'")}')">
-      ${n}
-    </div>`
-  ).join('');
-}
-
-function selectGuest(name){
-  selectedGuest = name;
-  document.getElementById('rsvp-search').value = name;
-  document.getElementById('rsvp-nome-selected').value = name;
-  document.getElementById('guest-results').style.display = 'none';
-}
-
-document.addEventListener('click', e => {
-  if(!e.target.closest('#rsvp-search') && !e.target.closest('#guest-results')){
-    document.getElementById('guest-results').style.display = 'none';
-  }
-});
-
-async function submitRSVP(){
-  const nome = document.getElementById('rsvp-nome-selected').value;
-  const vai  = document.getElementById('rsvp-vai').value;
-  const msg  = document.getElementById('rsvp-msg').value.trim();
-
-  if(!nome){ alert('Por favor selecione seu nome na lista.'); return; }
-  if(!vai){ alert('Por favor indique se vai comparecer.'); return; }
-
-  const btn = document.querySelector('.btn-primary');
-  btn.textContent = 'Enviando...';
-  btn.disabled = true;
-
-  const ok = await salvarConfirmacao(nome, vai, msg);
-
-  if(ok){
-    document.getElementById('rsvp-form-wrap').style.display='none';
-    document.getElementById('rsvp-success').style.display='block';
-  } else {
-    btn.textContent = 'Confirmar presença';
-    btn.disabled = false;
-    alert('Ops, houve um erro ao enviar. Tente novamente.');
-  }
-}
 
 // ══ COTAS ══
 function changeQty(btn, delta) {
@@ -1094,47 +986,43 @@ function changeQty(btn, delta) {
   card.querySelector('.cota-total').innerHTML = `Total: <strong>R$ ${total}</strong>`;
 }
 
-// ══ Gerador de payload PIX ══
-function crc16(str) {
-  let crc = 0xFFFF;
-  for (let i = 0; i < str.length; i++) {
-    crc ^= str.charCodeAt(i) << 8;
-    for (let j = 0; j < 8; j++) {
-      crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
-    }
+// ══ Gerador de payload PIX (EMV QR Code) ══
+function pixPayload(chave, valor, nome, cidade) {
+  function f(id, v) {
+    const l = v.length.toString().padStart(2,'0');
+    return `${id}${l}${v}`;
   }
-  return ((crc & 0xFFFF).toString(16).toUpperCase()).padStart(4,'0');
-}
+  function crc16ccitt(s) {
+    let c = 0xFFFF;
+    for (let i = 0; i < s.length; i++) {
+      c ^= s.charCodeAt(i) << 8;
+      for (let j = 0; j < 8; j++)
+        c = (c & 0x8000) ? ((c << 1) ^ 0x1021) & 0xFFFF : (c << 1) & 0xFFFF;
+    }
+    return c.toString(16).toUpperCase().padStart(4,'0');
+  }
 
-function tlv(id, value) {
-  const len = String(value.length).padStart(2,'0');
-  return `${id}${len}${value}`;
-}
-
-function gerarPixPayload(chave, valor, nome, cidade) {
-  const merchantName = nome.substring(0,25).toUpperCase();
-  const merchantCity = cidade.substring(0,15).toUpperCase();
+  const nomeClean = nome.normalize('NFD').replace(/[\u0300-\u036f]/g,'').substring(0,25).toUpperCase();
+  const cidadeClean = cidade.normalize('NFD').replace(/[\u0300-\u036f]/g,'').substring(0,15).toUpperCase();
   const valorStr = parseFloat(valor).toFixed(2);
 
-  const gui = tlv('00','BR.GOV.BCB.PIX');
-  const pixKey = tlv('01', chave);
-  const merchantAccountInfo = tlv('26', gui + pixKey);
+  const mai = f('26', f('00','BR.GOV.BCB.PIX') + f('01', chave));
+  const body =
+    f('00','01') +
+    mai +
+    f('52','0000') +
+    f('53','986') +
+    f('54', valorStr) +
+    f('58','BR') +
+    f('59', nomeClean) +
+    f('60', cidadeClean) +
+    f('62', f('05','***')) +
+    '6304';
 
-  let payload =
-    tlv('00','01') +
-    merchantAccountInfo +
-    tlv('52','0000') +
-    tlv('53','986') +
-    tlv('54', valorStr) +
-    tlv('58','BR') +
-    tlv('59', merchantName) +
-    tlv('60', merchantCity) +
-    tlv('62', tlv('05','***'));
-
-  payload += tlv('63','0000');
-  const crc = crc16(payload);
-  return payload.slice(0,-4) + tlv('63', crc);
+  return body + crc16ccitt(body);
 }
+
+let currentPixPayload = '';
 
 function presentear(btn) {
   const card = btn.closest('.cota-card');
@@ -1148,19 +1036,7 @@ function presentear(btn) {
   document.getElementById('qr-nome').textContent = nomePresente;
   document.getElementById('qr-valor').textContent = `R$ ${totalFmt}`;
 
-  // Gera payload PIX real
-  const payload = gerarPixPayload(
-    '85981777415',
-    totalReais,
-    'DIMAS FILHO',
-    'FORTALEZA'
-  );
-
-  // Renderiza QR code no canvas
-  const canvas = document.getElementById('qr-canvas');
-  QRCode.toCanvas(canvas, payload, { width: 200, margin: 1, color: { dark:'#1f2d5a', light:'#fdfcfa' } }, err => {
-    if(err) console.error(err);
-  });
+  currentPixPayload = pixPayload('+5585981777415', totalReais, 'JOSE GOMES DOS SANTOS FIL', 'FORTALEZA');
 
   document.getElementById('qr-modal').classList.add('open');
 }
@@ -1173,6 +1049,14 @@ function fecharQR() {
 document.getElementById('qr-modal').addEventListener('click', function(e) {
   if (e.target === this) fecharQR();
 });
+
+function copyPayload(){
+  navigator.clipboard.writeText(currentPixPayload).then(()=>{
+    const b = document.getElementById('btn-copy-payload');
+    b.textContent='✓ Código copiado!';
+    setTimeout(()=>b.textContent='Copiar código PIX completo',2500);
+  });
+}
 
 function copyPix(){
   navigator.clipboard.writeText('85981777415').then(()=>{
