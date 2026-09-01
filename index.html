@@ -884,18 +884,6 @@ function updateCountdown(){
 }
 
 // ══ COTAS ══
-function changeQty(btn, delta) {
-  const wrap = btn.closest('.cota-qty-wrap');
-  const numEl = wrap.querySelector('.cota-qty-num');
-  const card = btn.closest('.cota-card');
-  const valorCota = parseInt(card.dataset.valor); // em centavos
-  let qty = parseInt(numEl.textContent) + delta;
-  if (qty < 1) qty = 1;
-  numEl.textContent = qty;
-  const total = (valorCota * qty / 100).toFixed(2).replace('.',',');
-  card.querySelector('.cota-total').innerHTML = `Total: <strong>R$ ${total}</strong>`;
-}
-
 // ══ Gerador de payload PIX (EMV QR Code) ══
 function pixPayload(chave, valor, nome, cidade) {
   function f(id, v) {
@@ -937,10 +925,8 @@ let currentPixPayload = '';
 function presentear(btn) {
   const card = btn.closest('.cota-card');
   const nomePresente = card.dataset.nome;
-  const valorCota = parseInt(card.dataset.valor);
-  const qty = parseInt(card.querySelector('.cota-qty-num').textContent);
-  const total = valorCota * qty;
-  const totalReais = (total / 100).toFixed(2);
+  const valor = parseInt(card.dataset.valor);
+  const totalReais = (valor / 100).toFixed(2);
   const totalFmt = totalReais.replace('.',',');
 
   document.getElementById('qr-nome').textContent = nomePresente;
@@ -1342,30 +1328,18 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="cota-frame">
           <span class="cota-icon">🍦</span>
           <p class="cota-nome">Potão de sorvete pro casal</p>
-          <p class="cota-valor">R$ 100,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 100,00</strong></p>
+          <p class="cota-valor">R$ 100,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
 
       <!-- Presente 2 -->
-      <div class="cota-card" data-nome="Para tornar nossa lua de mel ainda mais especial" data-valor="80000">
+      <div class="cota-card" data-nome="Experiência inesquecível para os recém-casados" data-valor="80000">
         <svg class="pcard-corners" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><g stroke="#d8d0c4" stroke-width=".6" fill="none" vector-effect="non-scaling-stroke" opacity=".7"><path d="M5 14 L5 5 L14 5"/><path d="M86 5 L95 5 L95 14"/><path d="M5 86 L5 95 L14 95"/><path d="M95 86 L95 95 L86 95"/></g></svg>
         <div class="cota-frame">
           <span class="cota-icon">🌙</span>
-          <p class="cota-nome">Para tornar nossa lua de mel ainda mais especial</p>
-          <p class="cota-valor">R$ 800,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 800,00</strong></p>
+          <p class="cota-nome">Experiência inesquecível para os recém-casados</p>
+          <p class="cota-valor">R$ 800,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
@@ -1376,13 +1350,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="cota-frame">
           <span class="cota-icon">☕</span>
           <p class="cota-nome">Café da manhã gourmet superfaturado</p>
-          <p class="cota-valor">R$ 200,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 200,00</strong></p>
+          <p class="cota-valor">R$ 200,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
@@ -1393,13 +1361,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="cota-frame">
           <span class="cota-icon">🏡</span>
           <p class="cota-nome">Presente para Início da vida juntos</p>
-          <p class="cota-valor">R$ 500,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 500,00</strong></p>
+          <p class="cota-valor">R$ 500,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
@@ -1410,30 +1372,18 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="cota-frame">
           <span class="cota-icon">🍨</span>
           <p class="cota-nome">Fundo de Emergência para Contenção de Danos - FECD, conhecido como TPM</p>
-          <p class="cota-valor">R$ 100,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 100,00</strong></p>
+          <p class="cota-valor">R$ 100,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
 
       <!-- Presente 6 -->
-      <div class="cota-card" data-nome="Pix para estourar a boca do balão - Chame do que quiser" data-valor="100000">
+      <div class="cota-card" data-nome="Almoço na lua de mel 🍯" data-valor="15000">
         <svg class="pcard-corners" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><g stroke="#d8d0c4" stroke-width=".6" fill="none" vector-effect="non-scaling-stroke" opacity=".7"><path d="M5 14 L5 5 L14 5"/><path d="M86 5 L95 5 L95 14"/><path d="M5 86 L5 95 L14 95"/><path d="M95 86 L95 95 L86 95"/></g></svg>
         <div class="cota-frame">
-          <span class="cota-icon">🎈</span>
-          <p class="cota-nome">Pix para estourar a boca do balão - Chame do que quiser</p>
-          <p class="cota-valor">R$ 1.000,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 1.000,00</strong></p>
+          <span class="cota-icon">🍯</span>
+          <p class="cota-nome">Almoço na lua de mel 🍯</p>
+          <p class="cota-valor">R$ 150,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
@@ -1444,13 +1394,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="cota-frame">
           <span class="cota-icon">🍷</span>
           <p class="cota-nome">Noite de vinho para os recém-casados</p>
-          <p class="cota-valor">R$ 200,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 200,00</strong></p>
+          <p class="cota-valor">R$ 200,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
@@ -1461,13 +1405,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="cota-frame">
           <span class="cota-icon">🛏️</span>
           <p class="cota-nome">Mobília especial para nossa casa</p>
-          <p class="cota-valor">R$ 400,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 400,00</strong></p>
+          <p class="cota-valor">R$ 400,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
@@ -1478,166 +1416,95 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="cota-frame">
           <span class="cota-icon">💐</span>
           <p class="cota-nome">Para jogar o buquê na sua direção</p>
-          <p class="cota-valor">R$ 250,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 250,00</strong></p>
+          <p class="cota-valor">R$ 250,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
 
       <!-- Presente 10 -->
-      <div class="cota-card" data-nome="Uma experiência para guardarmos na memória" data-valor="80000">
-        <svg class="pcard-corners" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><g stroke="#d8d0c4" stroke-width=".6" fill="none" vector-effect="non-scaling-stroke" opacity=".7"><path d="M5 14 L5 5 L14 5"/><path d="M86 5 L95 5 L95 14"/><path d="M5 86 L5 95 L14 95"/><path d="M95 86 L95 95 L86 95"/></g></svg>
-        <div class="cota-frame">
-          <span class="cota-icon">📸</span>
-          <p class="cota-nome">Uma experiência para guardarmos na memória</p>
-          <p class="cota-valor">R$ 800,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 800,00</strong></p>
-          <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
-        </div>
-      </div>
-
-      <!-- Presente 11 -->
       <div class="cota-card" data-nome="Alguns reais para converter em euros" data-valor="30000">
         <svg class="pcard-corners" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><g stroke="#d8d0c4" stroke-width=".6" fill="none" vector-effect="non-scaling-stroke" opacity=".7"><path d="M5 14 L5 5 L14 5"/><path d="M86 5 L95 5 L95 14"/><path d="M5 86 L5 95 L14 95"/><path d="M95 86 L95 95 L86 95"/></g></svg>
         <div class="cota-frame">
           <span class="cota-icon">✈️</span>
           <p class="cota-nome">Alguns reais para converter em euros</p>
-          <p class="cota-valor">R$ 300,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 300,00</strong></p>
+          <p class="cota-valor">R$ 300,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
 
-      <!-- Presente 12 -->
+      <!-- Presente 11 -->
       <div class="cota-card" data-nome="Curso de culinária para os recém-casados" data-valor="50000">
         <svg class="pcard-corners" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><g stroke="#d8d0c4" stroke-width=".6" fill="none" vector-effect="non-scaling-stroke" opacity=".7"><path d="M5 14 L5 5 L14 5"/><path d="M86 5 L95 5 L95 14"/><path d="M5 86 L5 95 L14 95"/><path d="M95 86 L95 95 L86 95"/></g></svg>
         <div class="cota-frame">
           <span class="cota-icon">🍝</span>
           <p class="cota-nome">Curso de culinária para os recém-casados</p>
-          <p class="cota-valor">R$ 500,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 500,00</strong></p>
+          <p class="cota-valor">R$ 500,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
 
-      <!-- Presente 13 -->
+      <!-- Presente 12 -->
       <div class="cota-card" data-nome="Combustível para rolê sem rumo e sem pressa" data-valor="20000">
         <svg class="pcard-corners" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><g stroke="#d8d0c4" stroke-width=".6" fill="none" vector-effect="non-scaling-stroke" opacity=".7"><path d="M5 14 L5 5 L14 5"/><path d="M86 5 L95 5 L95 14"/><path d="M5 86 L5 95 L14 95"/><path d="M95 86 L95 95 L86 95"/></g></svg>
         <div class="cota-frame">
           <span class="cota-icon">🛵</span>
           <p class="cota-nome">Combustível para rolê sem rumo e sem pressa</p>
-          <p class="cota-valor">R$ 200,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 200,00</strong></p>
+          <p class="cota-valor">R$ 200,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
 
-      <!-- Presente 14 -->
+      <!-- Presente 13 -->
       <div class="cota-card" data-nome="Parcelinha da lava louça" data-valor="30000">
         <svg class="pcard-corners" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><g stroke="#d8d0c4" stroke-width=".6" fill="none" vector-effect="non-scaling-stroke" opacity=".7"><path d="M5 14 L5 5 L14 5"/><path d="M86 5 L95 5 L95 14"/><path d="M5 86 L5 95 L14 95"/><path d="M95 86 L95 95 L86 95"/></g></svg>
         <div class="cota-frame">
           <span class="cota-icon">🍽️</span>
           <p class="cota-nome">Parcelinha da lava louça</p>
-          <p class="cota-valor">R$ 300,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 300,00</strong></p>
+          <p class="cota-valor">R$ 300,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
 
-      <!-- Presente 15 -->
+      <!-- Presente 14 -->
       <div class="cota-card" data-nome="Jantar romântico na Lua de Mel" data-valor="40000">
         <svg class="pcard-corners" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><g stroke="#d8d0c4" stroke-width=".6" fill="none" vector-effect="non-scaling-stroke" opacity=".7"><path d="M5 14 L5 5 L14 5"/><path d="M86 5 L95 5 L95 14"/><path d="M5 86 L5 95 L14 95"/><path d="M95 86 L95 95 L86 95"/></g></svg>
         <div class="cota-frame">
           <span class="cota-icon">🕯️</span>
           <p class="cota-nome">Jantar romântico na Lua de Mel</p>
-          <p class="cota-valor">R$ 400,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 400,00</strong></p>
+          <p class="cota-valor">R$ 400,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
 
-      <!-- Presente 16 -->
+      <!-- Presente 15 -->
       <div class="cota-card" data-nome="Spa after casamentório" data-valor="50000">
         <svg class="pcard-corners" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><g stroke="#d8d0c4" stroke-width=".6" fill="none" vector-effect="non-scaling-stroke" opacity=".7"><path d="M5 14 L5 5 L14 5"/><path d="M86 5 L95 5 L95 14"/><path d="M5 86 L5 95 L14 95"/><path d="M95 86 L95 95 L86 95"/></g></svg>
         <div class="cota-frame">
           <span class="cota-icon">💆</span>
           <p class="cota-nome">Spa after casamentório</p>
-          <p class="cota-valor">R$ 500,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 500,00</strong></p>
+          <p class="cota-valor">R$ 500,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
 
-      <!-- Presente 17 -->
+      <!-- Presente 16 -->
       <div class="cota-card" data-nome="Parcelinha da televisão para Bia assistir Naruto Shippuden" data-valor="30000">
         <svg class="pcard-corners" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><g stroke="#d8d0c4" stroke-width=".6" fill="none" vector-effect="non-scaling-stroke" opacity=".7"><path d="M5 14 L5 5 L14 5"/><path d="M86 5 L95 5 L95 14"/><path d="M5 86 L5 95 L14 95"/><path d="M95 86 L95 95 L86 95"/></g></svg>
         <div class="cota-frame">
           <span class="cota-icon">📺</span>
           <p class="cota-nome">Parcelinha da televisão para Bia assistir Naruto Shippuden</p>
-          <p class="cota-valor">R$ 300,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 300,00</strong></p>
+          <p class="cota-valor">R$ 300,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
 
-      <!-- Presente 18 -->
+      <!-- Presente 17 -->
       <div class="cota-card" data-nome="Champanhe para brindarmos na lua de mel" data-valor="20000">
         <svg class="pcard-corners" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><g stroke="#d8d0c4" stroke-width=".6" fill="none" vector-effect="non-scaling-stroke" opacity=".7"><path d="M5 14 L5 5 L14 5"/><path d="M86 5 L95 5 L95 14"/><path d="M5 86 L5 95 L14 95"/><path d="M95 86 L95 95 L86 95"/></g></svg>
         <div class="cota-frame">
           <span class="cota-icon">🥂</span>
           <p class="cota-nome">Champanhe para brindarmos na lua de mel</p>
-          <p class="cota-valor">R$ 200,00 por cota · 10 cotas</p>
-          <div class="cota-qty-wrap">
-            <button class="cota-qty-btn" onclick="changeQty(this,-1)">−</button>
-            <span class="cota-qty-num">1</span>
-            <button class="cota-qty-btn" onclick="changeQty(this,1)">+</button>
-          </div>
-          <p class="cota-total">Total: <strong>R$ 200,00</strong></p>
+          <p class="cota-valor">R$ 200,00</p>
           <button class="btn-presentear" onclick="presentear(this)">Presentear</button>
         </div>
       </div>
